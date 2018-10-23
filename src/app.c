@@ -282,6 +282,7 @@ void pulsoIny1()
                 LATDbits.LATD1 = 0;
                 tiempoIny = tiempoIny + duracion;
                 LATCbits.LATC15 = 0;
+                stage = 0;
             }
             break;
         case 5://case para realizar pruebas, no iria en el definitorio.
