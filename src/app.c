@@ -106,6 +106,9 @@ void pulsoIny2();
 void pulsoIny3();
 void pulsoIny4();
 
+void pulsoBanco1();
+void pulsoBanco2();
+
 void tick10usIny();
 void tick50usRpm();
 
@@ -177,7 +180,7 @@ void APP_Tasks ( void )
         case APP_STATE_SERVICE_TASKS:
         {           
             
-            pulsoIny1();
+            pulsoBanco1();
             
             break;
         }
@@ -204,16 +207,17 @@ void APP_Tasks ( void )
  * pulsoInyX()
  * funciones listas para recibir tipo de dato (int periodo, int duty, int duracion)
  */
-void pulsoIny1()
+
+void pulsoBanco1()
 {
     static int stage = 0;
     static int tiempoIny = 0;
-    int duty, aux, periodo, duracion, dutyNeg, dutyPos;;
+    int duty ,aux, periodo, duracion, dutyNeg, dutyPos;
     switch(stage)
     {
         case 0:
             tickActualIny = 0;
-            LATCbits.LATC15 = 1;
+            //LATCbits.LATC15 = 1;
             stage++;
             break;
         case 1:
@@ -296,6 +300,15 @@ void pulsoIny1()
         default:
             break;
     }
+}
+
+void pulsoBanco2()
+{
+    
+}
+void pulsoIny1()
+{
+   
 }
 void pulsoIny2()
 {
