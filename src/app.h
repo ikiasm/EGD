@@ -203,6 +203,9 @@ void pulsoIny2();
 void pulsoIny3();
 void pulsoIny4();
 
+void pulsoBanco1();
+void pulsoBanco2();
+
 void tick10usIny();
 void tick50usRpm();
 
