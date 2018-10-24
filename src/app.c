@@ -180,7 +180,7 @@ void APP_Tasks ( void )
         case APP_STATE_SERVICE_TASKS:
         {           
             
-            pulsoBanco1();
+            pulsoIny1();
             
             break;
         }
@@ -285,7 +285,7 @@ void pulsoBanco1()
                 tickActualIny = 0;
                 LATDbits.LATD1 = 0;
                 tiempoIny = tiempoIny + duracion;
-                LATCbits.LATC15 = 0;
+                //LATCbits.LATC15 = 0;
                 stage = 0;
             }
             break;
@@ -308,7 +308,9 @@ void pulsoBanco2()
 }
 void pulsoIny1()
 {
-   
+    LATCbits.LATC15 = 1;
+    pulsoBanco1();
+    LATCbits.LATC15 = 0;
 }
 void pulsoIny2()
 {
