@@ -198,12 +198,12 @@ void APP_Initialize ( void );
 
 void APP_Tasks( void );
 
-void pulsoIny1();
+void pulsoIny1(int tiempo);
 void pulsoIny2();
 void pulsoIny3();
 void pulsoIny4();
 
-void pulsoBanco1();
+bool pulsoBanco1(int tiempo);
 void pulsoBanco2();
 
 void tick10usIny();
