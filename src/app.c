@@ -101,12 +101,12 @@ APP_DATA appData;
 
 /* TODO:  Add any necessary local functions.
 */
-void pulsoIny1();
+void pulsoIny1(int tiempo);
 void pulsoIny2();
 void pulsoIny3();
 void pulsoIny4();
 
-void pulsoBanco1();
+bool pulsoBanco1(int tiempo);
 void pulsoBanco2();
 
 void tick10usIny();
@@ -179,8 +179,8 @@ void APP_Tasks ( void )
 
         case APP_STATE_SERVICE_TASKS:
         {           
-            
-            pulsoIny1();
+            pulsoIny1(1500);
+            //pulsoBanco1();
             
             break;
         }
@@ -208,15 +208,21 @@ void APP_Tasks ( void )
  * funciones listas para recibir tipo de dato (int periodo, int duty, int duracion)
  */
 
-void pulsoBanco1()
+bool pulsoBanco1(int tiempo)
 {
     static int stage = 0;
-    static int tiempoIny = 0;
-    int duty ,aux, periodo, duracion, dutyNeg, dutyPos;
+    static int tiempoAcumulado = 0;
+    static int duracionVariable;
+    static bool status = false;
+    int duty, dutyNeg, dutyPos;
+    int aux, periodo, duracion, tiempoAux;
     switch(stage)
     {
         case 0:
             tickActualIny = 0;
+            tiempoAcumulado = 0;
+            //tiempoAux = (tiempo / 10);//pasado a ticks de 10 us.
+            status = true;
             //LATCbits.LATC15 = 1;
             stage++;
             break;
@@ -235,7 +241,7 @@ void pulsoBanco1()
             {
                 stage++;
                 tickActualIny = 0;
-                tiempoIny = tiempoIny + duracion;
+                tiempoAcumulado = tiempoAcumulado + duracion;
             }            
             break;
         case 2:
@@ -251,12 +257,14 @@ void pulsoBanco1()
             {
                 stage++;
                 tickActualIny = 0;
-                tiempoIny = tiempoIny + duracion;
+                tiempoAcumulado = tiempoAcumulado + duracion;
             }
             break;
         case 3:
             aux = 0;
             duracion = 54;
+            tiempoAux = (tiempo / 10);//pasado a ticks de 10 us.
+            duracionVariable = tiempoAux - tiempoAcumulado;
             periodo = 2000;//periodo para 20kHz con clock de 40MHz
             dutyPos = 90;//90;
             dutyNeg = (100 - dutyPos);
@@ -264,12 +272,12 @@ void pulsoBanco1()
             DRV_TMR1_PeriodValueSet(periodo);
             aux = (duty*periodo)/100;
             DRV_OC0_Duty(aux);
-            if(tickActualIny > duracion)
+            if(tickActualIny > duracionVariable)
             {
                 stage++;
                 tickActualIny = 0;
                 DRV_TMR1_PeriodValueSet(800);//importante para que tenga tiempo 
-                tiempoIny = tiempoIny + duracion;//de setear el periodo y no se cuelgue
+                tiempoAcumulado = tiempoAcumulado + duracionVariable;//de setear el periodo y no se cuelgue
             }                                
             break;
         case 4:
@@ -284,33 +292,45 @@ void pulsoBanco1()
                 stage++; 
                 tickActualIny = 0;
                 LATDbits.LATD1 = 0;
-                tiempoIny = tiempoIny + duracion;
+                tiempoAcumulado = tiempoAcumulado + duracion;
+                status = false;
                 //LATCbits.LATC15 = 0;
-                stage = 0;
             }
             break;
-        case 5://case para realizar pruebas, no iria en el definitorio.
-            if(tickActualIny > (3160 - tiempoIny))
+        case 5://case para realizar pruebas, no iria en el definitivo.
+            //status = false;
+            if(tickActualIny > (3160 - tiempoAcumulado))
             {
                 stage = 0;
                 tickActualIny = 0;
-                tiempoIny = 0;
+                tiempoAcumulado = 0;
+                
             }
             break;
         default:
             break;
     }
+    return status;
 }
 
 void pulsoBanco2()
 {
     
 }
-void pulsoIny1()
+void pulsoIny1(int tiempo)
 {
-    LATCbits.LATC15 = 1;
-    pulsoBanco1();
-    LATCbits.LATC15 = 0;
+    static bool burstRunning = false;
+    if(burstRunning)
+    {
+        LATCbits.LATC15 = 1;
+    }
+    //pulsoBanco1();
+    burstRunning = pulsoBanco1(tiempo);
+    if(!burstRunning)
+    {
+        LATCbits.LATC15 = 0;
+    }  
+    
 }
 void pulsoIny2()
 {
@@ -338,7 +358,7 @@ void tick50usRpm()
 void prueba()
 {
     //DRV_OC1_Start();
-
+    
     LATCbits.LATC15 = 1;
     LATCbits.LATC15 = 0;
 }
